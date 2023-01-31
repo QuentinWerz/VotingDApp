@@ -49,7 +49,7 @@ export default function Home({ }) {
     setOwner(owner)
 
     let blockNumber = await provider.getBlockNumber()
-    let endBlock = blockNumber + 500
+    let endBlock = blockNumber + 50
 
     let filter = {
       address: contractAddress,
