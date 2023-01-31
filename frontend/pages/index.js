@@ -56,27 +56,24 @@ export default function Home({ }) {
     setOwner(owner)
 
     let blockNumber = await provider.getBlockNumber()
-    let endBlock = blockNumber + 20
+    let endBlock = blockNumber + 500
 
     let filter = {
       address: contractAddress,
-      // fromBlock: blockNumber,
-      // toBlock: endBlock
     };
-    console.log({filter})
 
-    let eventsR = [];
+    let eventsConsolidated = [];
     for(let i = blockNumber; i < endBlock; i ++) {
       const _startBlock = i;
       const _endBlock = i + 1;
       const events = await contract.queryFilter(filter, _startBlock, _endBlock);
-      eventsR = [...eventsR, ...events]
+      eventsConsolidated = [...eventsConsolidated, ...events]
     }
-    //let events = await contract.queryFilter(filter)
-    console.log({eventsR})
+
+    console.log({eventsConsolidated})
     let voterRegistered = [], workflowStatusChange = [], proposalRegistered = [], voted = [];
 
-    eventsR.forEach(e => {
+    eventsConsolidated.forEach(e => {
       if (e.event === "VoterRegistered") {
         voterRegistered.push(e.args)
       }
