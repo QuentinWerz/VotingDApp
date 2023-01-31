@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
-import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 ///@title Voting contract
 ///@author Quentin Werz
@@ -95,7 +95,7 @@ contract Voting is Ownable {
     function setVote(uint _id) external onlyVoters {
         require(workflowStatus == WorkflowStatus.VotingSessionStarted, 'Voting session havent started yet');
         require(voters[msg.sender].hasVoted != true, 'You have already voted');
-        require(_id < proposalsArray.length, 'Proposal not found'); // pas obligé, et pas besoin du >0 car uint
+        require(_id < proposalsArray.length, 'Proposal not found');
 
         voters[msg.sender].votedProposalId = _id;
         voters[msg.sender].hasVoted = true;

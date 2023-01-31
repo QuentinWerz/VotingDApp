@@ -23,25 +23,16 @@ export default function Home({ }) {
   //GLOBAL
   const [status, setStatus] = useState('Registering Voters')
   const [owner, setOwner] = useState('')
-  const [isRegistered, setIsRegistered] = useState(false)
+  const [isRegistered, setIsRegistered] = useState(true)
   const [hasVoted, setHasVoted] = useState(false)
   const [voters, setVoters] = useState([])
   const [proposals, setProposals] = useState([])
   const [loading, setLoading] = useState(false)
-  const [ID, setID] = useState()
   const [winningProposal, setWinningProposal] = useState()
 
   //INPUTS
   const [proposalWritten, setProposalWritten] = useState('')
   const [addressVoter, setAddressVoter] = useState()
-
-  //LISTENERS LOG
-  useEffect(() => { console.log({ voters }) }, [voters])
-  useEffect(() => { console.log({ isRegistered }) }, [isRegistered])
-  useEffect(() => { console.log({ status }) }, [status])
-  useEffect(() => { console.log('Listener proposal : ', { proposals }) }, [proposals])
-  useEffect(() => { console.log({ proposalWritten }) }, [proposalWritten])
-  useEffect(() => { console.log({ ID }) }, [ID])
 
   //USE EFFECT EVENTS
   useEffect(() => {
@@ -58,11 +49,11 @@ export default function Home({ }) {
     let owner = await contract.owner()
     setOwner(owner)
 
-    //let blockNumber = await provider.getBlockNumber()
+    let blockNumber = await provider.getBlockNumber()
 
     let filter = {
       address: contractAddress,
-      fromBlock: 0
+      fromBlock: blockNumber
     };
 
     let events = await contract.queryFilter(filter)
@@ -92,10 +83,8 @@ export default function Home({ }) {
     // voters
     setVoters(voterRegistered.map(e => e.voterAddress))
     //structure the voters array
-    console.log('voter test : ', await getVoter(address))
     let votersModified = voters.map(async (voter) => {
       let vote = await getVoter(voter)
-      console.log({ vote })
       return {
         votedProposalId: vote?.votedProposalId.toString(),
         isRegistered: vote?.isRegistered,
@@ -118,7 +107,6 @@ export default function Home({ }) {
     //structure the proposals array
     const proposalsFound = proposalRegistered.map(async (id) => {
       let proposalFound = await getOneProposal(id)
-      console.log({ proposalFound })
       return {
         id: id,
         description: proposalFound?.description,
@@ -130,6 +118,9 @@ export default function Home({ }) {
     for (let i = 0; i < proposals.length ; i++) {
       if(proposals[i].voteCount > proposals[i-1]?.voteCount) {setWinningProposal(proposals[i].id)}
     }
+    setLoading(false)
+    setAddressVoter('')
+    setProposalWritten('')
   }
 
   //ADDING VOTER
@@ -160,8 +151,9 @@ export default function Home({ }) {
         duration: 5000,
         isClosable: true,
       })
-    }
     setLoading(false)
+    setAddressVoter('')
+    }
   }
 
   // STARTING THE PROPOSAL SESSION
@@ -191,8 +183,8 @@ export default function Home({ }) {
         duration: 5000,
         isClosable: true,
       })
-    }
     setLoading(false)
+    }
   }
 
   //ADD PROPOSAL
@@ -223,8 +215,9 @@ export default function Home({ }) {
         duration: 5000,
         isClosable: true,
       })
-    }
     setLoading(false)
+    setProposalWritten('')
+    }
   }
 
   //GET PROPOSAL
@@ -232,16 +225,13 @@ export default function Home({ }) {
   ///@param _id Id of the proposal
   const getOneProposal = async (id) => {
     try {
-      setLoading(true)
       const contract = new ethers.Contract(contractAddress, Contract.abi, provider)
       let proposal = await contract.connect(address).getOneProposal(id)
-      console.log('proposal in getOneProposal : ', proposal.voteCount.toString())
       return proposal
     }
     catch (err) {
       console.log(err)
     }
-    setLoading(false)
   }
 
   //GET VOTER
@@ -249,16 +239,13 @@ export default function Home({ }) {
   ///@param _address Address of the voter
   const getVoter = async (address) => {
     try {
-      setLoading(true)
       const contract = new ethers.Contract(contractAddress, Contract.abi, provider)
       let voter = await contract.connect(address).getVoter(address)
-      console.log('voter in getVoter : ', voter)
       return voter
     }
     catch (err) {
       console.log(err)
     }
-    setLoading(false)
   }
 
   // ENDING THE PROPOSAL SESSION
@@ -288,8 +275,8 @@ export default function Home({ }) {
         duration: 5000,
         isClosable: true,
       })
-    }
     setLoading(false)
+    }
   }
 
   // STARTING THE VOTING SESSION
@@ -320,8 +307,8 @@ export default function Home({ }) {
         duration: 5000,
         isClosable: true,
       })
-    }
     setLoading(false)
+    }
   }
 
   //SET VOTE
@@ -351,8 +338,8 @@ export default function Home({ }) {
         duration: 5000,
         isClosable: true,
       })
-    }
     setLoading(false)
+    }
   }
 
   // ENDING THE VOTING SESSION
@@ -382,8 +369,8 @@ export default function Home({ }) {
         duration: 5000,
         isClosable: true,
       })
-    }
     setLoading(false)
+    }
   }
 
   // TALLYING VOTES
@@ -413,8 +400,8 @@ export default function Home({ }) {
         duration: 5000,
         isClosable: true,
       })
-    }
     setLoading(false)
+    }
   }
 
   //NEXT STATUS
@@ -459,20 +446,25 @@ export default function Home({ }) {
               <Flex width="30%" direction='row' justifyContent='flex-start' alignItems='center'>
                 <Text fontWeight='bold' >Current status : </Text>
                 <Text margin='0px 20px 0px 5px' fontWeight='bold' >{status}</Text>
-                {address === owner && status !== 'Votes tallied' && <Button colorScheme="blue" onClick={() => { nextStatus() }}>{status === 'Voting session ended' ? 'Tally votes' : 'Next step'}</Button>}
+                {address === owner && status !== 'Votes tallied' && <Button isLoading={loading} colorScheme="blue" onClick={() => { nextStatus() }}>{status === 'Voting session ended' ? 'Tally votes' : 'Next step'}</Button>}
               </Flex>
               {address === owner && status === 'Registering voters' &&
                 <Flex width="70%" direction="row" justifyContent='flex-end' alignItems='center'>
                   <Text fontWeight='bold'>Address : </Text>
-                  <Input placeholder={`Voter's address`} width='50%' margin='0px 20px 0px 20px' onChange={e => setAddressVoter(e.target.value)} />
-                  <Button colorScheme='blue' onClick={() => { addVoter(addressVoter) }}>Add voter</Button>
+                  <Input placeholder={`Voter's address`} width='50%' margin='0px 20px 0px 20px' value={addressVoter} onChange={e => setAddressVoter(e.target.value)} />
+                  <Button isLoading={loading} colorScheme='blue' onClick={() => { addVoter(addressVoter) }}>Add voter</Button>
                 </Flex>
               }
               {status === 'Proposals registration started' && isRegistered &&
                 <Flex width="70%" direction="row" justifyContent='flex-end' alignItems='center'>
                   <Text fontWeight='bold'>Proposal :</Text>
-                  <Input margin='0px 20px 0px 20px' width='50%' placeholder={`Enter your proposal here`} onChange={e => setProposalWritten(e.target.value)} />
-                  <Button colorScheme='blue' onClick={() => { addProposal(proposalWritten) }}>Add proposal</Button>
+                  <Input margin='0px 20px 0px 20px' width='50%' placeholder={`Enter your proposal here`} value={proposalWritten} onChange={e => setProposalWritten(e.target.value)} />
+                  <Button isLoading={loading} colorScheme='blue' onClick={() => { addProposal(proposalWritten)  }}>Add proposal</Button>
+                </Flex>
+              }
+              {status !== 'Registering voters' && !isRegistered &&
+                <Flex width="70%" direction="row" justifyContent='flex-end' alignItems='center'>
+                  <Text fontWeight='bold'>You're not registered for this session.</Text>
                 </Flex>
               }
               {status === 'Votes tallied' && isRegistered &&
@@ -494,7 +486,6 @@ export default function Home({ }) {
                     <AlertIcon />
                     <Flex direction="column">
                       <Text as='span'>No proposal yet.</Text>
-                      <Text><Link href="addaproposal" style={{ "fontWeight": "bold" }}>Add a proposal !</Link></Text>
                     </Flex>
                   </Alert>
                 </Flex>

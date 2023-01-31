@@ -13,7 +13,7 @@ export const Header = ({  }) => {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <Flex h="10vh" p="2rem" justifyContent="space-between" alignItems="center">
-                <Text fontWeight={'extrabold'}>💌 Voting DApp</Text>
+                <Text fontWeight={'extrabold'} fontSize={20}>💌 Voting DApp</Text>
                 <Flex
                     direction='row'
                     justifyContent="space-between"
