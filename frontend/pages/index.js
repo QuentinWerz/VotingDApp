@@ -1,6 +1,6 @@
-import { Heading, Flex, Text, Textarea, Input, Button, useToast, Alert, AlertIcon } from '@chakra-ui/react'
+import { Flex, Text, Input, Button, useToast, Alert, AlertIcon } from '@chakra-ui/react'
 import { useState, useEffect } from 'react'
-import { useAccount, useContractRead, useProvider, useSigner } from 'wagmi'
+import { useAccount, useProvider, useSigner } from 'wagmi'
 import Contract from "../Voting.json"
 import { ethers } from 'ethers'
 import { Proposal } from '@/components/Proposal/Proposal'
@@ -32,13 +32,6 @@ export default function Home({ }) {
   //INPUTS
   const [proposalWritten, setProposalWritten] = useState('')
   const [addressVoter, setAddressVoter] = useState()
-
-  //LISTENERS
-  useEffect(()=>{console.log({owner})}, [owner])
-  useEffect(()=>{console.log({isRegistered})}, [isRegistered])
-  useEffect(()=>{console.log({hasVoted})}, [hasVoted])
-  useEffect(()=>{console.log({status})}, [status])
-  useEffect(()=>{console.log({address})}, [address])
 
   //USE EFFECT EVENTS
   useEffect(() => {
