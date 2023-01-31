@@ -24,10 +24,12 @@ export default function Home({ }) {
   const [status, setStatus] = useState('Registering Voters')
   const [owner, setOwner] = useState('')
   const [isRegistered, setIsRegistered] = useState(false)
+  const [hasVoted, setHasVoted] = useState(false)
   const [voters, setVoters] = useState([])
   const [proposals, setProposals] = useState([])
   const [loading, setLoading] = useState(false)
   const [ID, setID] = useState()
+  const [winningProposal, setWinningProposal] = useState()
 
   //INPUTS
   const [proposalWritten, setProposalWritten] = useState('')
@@ -50,7 +52,7 @@ export default function Home({ }) {
 
   //FUNCTIONS/////////////////////////
 
-  //GET EVENTS AND ANALYSE
+  //GET EVENTS AND STRUCTURE DATAS
   const getEvents = async () => {
     const contract = new ethers.Contract(contractAddress, Contract.abi, provider)
     let owner = await contract.owner()
@@ -86,6 +88,7 @@ export default function Home({ }) {
     // is registered
     let voter = await getVoter(address)
     voter?.isRegistered ? setIsRegistered(true) : setIsRegistered(false)
+    voter?.hasVoted ? setHasVoted(true) : setHasVoted(false)
     // voters
     setVoters(voterRegistered.map(e => e.voterAddress))
     //structure the voters array
@@ -119,10 +122,14 @@ export default function Home({ }) {
       return {
         id: id,
         description: proposalFound?.description,
-        voteCount: voted.filter(e => e.proposalId === id).length
+        voteCount: voted.filter(e => Number(e.proposalId.toString()) === id).length
       }
     })
     Promise.all(proposalsFound).then(function (results) { setProposals(results) })
+    //winning proposal
+    for (let i = 0; i < proposals.length ; i++) {
+      if(proposals[i].voteCount > proposals[i-1]?.voteCount) {setWinningProposal(proposals[i].id)}
+    }
   }
 
   //ADDING VOTER
@@ -443,36 +450,42 @@ export default function Home({ }) {
   }
 
   return (
-    <Flex width="100%" direction="column" alignItems="center" flexWrap="wrap" >
+    <Flex width="100%" direction="column" alignItems="center" flexWrap="wrap" backgroundColor='#E2E8F0'>
 
       {isConnected ?
         <>
-          <Flex width='100%' height='100%' flexDirection='column'>
-            <Flex width='100%' direction='row' justifyContent='space-between'>
-              <Flex width="50%" direction='row' justifyContent='flex-start' alignItems='center'>
-                <Text marginRight={20} fontWeight='bold' >{status}</Text>
-                {address === owner && <Button onClick={() => { nextStatus() }}>Next step</Button>}
+          <Flex width='100%' height='100%' flexDirection='column' alignItems='center'>
+            <Flex width='100%' direction='row' justifyContent='space-between' alignItems='center' backgroundColor='#FFF' padding={5} borderRadius={10}>
+              <Flex width="30%" direction='row' justifyContent='flex-start' alignItems='center'>
+                <Text fontWeight='bold' >Current status : </Text>
+                <Text margin='0px 20px 0px 5px' fontWeight='bold' >{status}</Text>
+                {address === owner && status !== 'Votes tallied' && <Button colorScheme="blue" onClick={() => { nextStatus() }}>{status === 'Voting session ended' ? 'Tally votes' : 'Next step'}</Button>}
               </Flex>
               {address === owner && status === 'Registering voters' &&
-                <Flex mt="1rem" width="30%" direction="row">
-                  <Text>Address : </Text>
-                  <Input placeholder={`Voter's address`} onChange={e => setAddressVoter(e.target.value)} />
+                <Flex width="70%" direction="row" justifyContent='flex-end' alignItems='center'>
+                  <Text fontWeight='bold'>Address : </Text>
+                  <Input placeholder={`Voter's address`} width='50%' margin='0px 20px 0px 20px' onChange={e => setAddressVoter(e.target.value)} />
                   <Button colorScheme='blue' onClick={() => { addVoter(addressVoter) }}>Add voter</Button>
                 </Flex>
               }
               {status === 'Proposals registration started' && isRegistered &&
-                <Flex mt="1rem" width="70%" direction="row" justifyContent='flex-start' alignItems='center'>
-                  <Text>Proposal :</Text>
-                  <Input marginRight={20} width='50%' placeholder={`Enter your proposal here`} onChange={e => setProposalWritten(e.target.value)} />
+                <Flex width="70%" direction="row" justifyContent='flex-end' alignItems='center'>
+                  <Text fontWeight='bold'>Proposal :</Text>
+                  <Input margin='0px 20px 0px 20px' width='50%' placeholder={`Enter your proposal here`} onChange={e => setProposalWritten(e.target.value)} />
                   <Button colorScheme='blue' onClick={() => { addProposal(proposalWritten) }}>Add proposal</Button>
                 </Flex>
               }
+              {status === 'Votes tallied' && isRegistered &&
+                <Flex width="70%" direction="row" justifyContent='flex-end' alignItems='center'>
+                  <Text fontWeight='bold'>Winning proposal : {winningProposal}</Text>
+                </Flex>
+              }
             </Flex>
-            <Flex width="100%" direction='row' justifyContent='space-around'>
+            <Flex grow={1} width="100%" direction='row' justifyContent='space-evenly' flexWrap='wrap'>
               {proposals?.length > 0 ?
                 proposals.map(proposal => {
                   return (
-                    <Proposal proposal={proposal} />
+                    <Proposal proposal={proposal} setVote={setVote} status={status} isRegistered={isRegistered} hasVoted={hasVoted} loading={loading} winningProposal={winningProposal}/>
                   )
                 })
                 :

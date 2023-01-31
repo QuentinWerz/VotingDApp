@@ -1,17 +1,27 @@
-import { Button, Text, Card, CardHeader, CardBody, CardFooter } from '@chakra-ui/react'
+import { Button, Text, Card, CardHeader, CardBody, CardFooter, Flex } from '@chakra-ui/react'
 import { useAccount } from 'wagmi'
 
-export const Proposal = ({ proposal }) => {
+export const Proposal = ({ proposal, setVote, status, isRegistered, hasVoted, loading, winningProposal }) => {
     const { address } = useAccount()
     return (
-        <Card mt={["1rem", "1rem", 0,0]} minWidth="30%" ml="1%" mr="1%">
+        <Card margin={5} minWidth="30%" height='40%' backgroundColor={winningProposal === proposal.id ? '#2F8' : '#FFF'}>
             <CardBody>
-                <Text>
-                    {proposal.id} {proposal.description}
-                </Text>
-                <Button onClick={()=>{}}>
-                    Vote
-                </Button>
+                <Flex height='100%' direction='column' justifyContent='space-between' alignItems='center'>
+                    <Flex width='100%' direction='row' justifyContent='space-between' alignItems='center' >
+                        <Text mb={2} width='30%' textAlign='start' fontWeight='bolder'> Proposal n°{proposal.id}</Text>
+                        <Text mb={2} width='30%' textAlign='end' fontWeight='bolder'> Vote count : {proposal.voteCount}</Text>
+                    </Flex>
+                    <Text mb={2}>{proposal.description}</Text>
+                    {status === 'Voting session started' && isRegistered && !hasVoted ?
+                    <Button isLoading={loading} colorScheme='green' width='22%' onClick={()=>{setVote(proposal.id)}}>
+                        Vote
+                    </Button>
+                    :
+                    <Button cursor='not-allowed' colorScheme='gray' width='22%'>
+                        Vote
+                    </Button>
+                    }
+                </Flex>
             </CardBody>
         </Card>
     )

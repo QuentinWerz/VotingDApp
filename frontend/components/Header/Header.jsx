@@ -3,7 +3,7 @@ import { Flex, Text } from '@chakra-ui/react'
 import Link from 'next/link'
 import Head from 'next/head'
 
-export const Header = ({ }) => {
+export const Header = ({  }) => {
     return (
         <>
             <Head>
@@ -12,8 +12,8 @@ export const Header = ({ }) => {
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-            <Flex h="15vh" p="2rem" justifyContent="space-between" alignItems="center">
-                <Text fontWeight={'extrabold'}>Voting DApp</Text>
+            <Flex h="10vh" p="2rem" justifyContent="space-between" alignItems="center">
+                <Text fontWeight={'extrabold'}>💌 Voting DApp</Text>
                 <Flex
                     direction='row'
                     justifyContent="space-between"
