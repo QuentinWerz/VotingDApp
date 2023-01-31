@@ -100,17 +100,18 @@ export default function Home({ }) {
     })
     Promise.all(votersModified).then(function (results) { setVoters(results) })
     //status
-    let status;
+    let statusFound;
     switch (workflowStatusChange.reduce(function (prev, cur) { return prev.newStatus > cur.newStatus ? prev.newStatus : cur.newStatus }, -Infinity)) {
-      case 0: status = 'Registering voters'; break
-      case 1: status = 'Proposals registration started'; break
-      case 2: status = 'Proposals registration ended'; break
-      case 3: status = 'Voting session started'; break
-      case 4: status = 'Voting session ended'; break
-      case 5: status = 'Votes tallied'; break
-      default: status = 'Registering voters'; break
+      case 0: statusFound = 'Registering voters'; break
+      case 1: statusFound = 'Proposals registration started'; break
+      case 2: statusFound = 'Proposals registration ended'; break
+      case 3: statusFound = 'Voting session started'; break
+      case 4: statusFound = 'Voting session ended'; break
+      case 5: statusFound = 'Votes tallied'; break
+      default: statusFound = 'Registering voters'; break
     }
-    setStatus(status)
+    console.log({statusFound})
+    setStatus(statusFound)
     //structure the proposals array
     const proposalsFound = proposalRegistered.map(async (id) => {
       let proposalFound = await getOneProposal(id)
