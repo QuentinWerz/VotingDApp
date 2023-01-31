@@ -71,7 +71,7 @@ export default function Home({ }) {
       const _endBlock = Math.min(endBlock, i + 1);
       const events = await contract.queryFilter(filter, _startBlock, _endBlock);
       eventsR = [...eventsR, ...events]
-
+    }
     //let events = await contract.queryFilter(filter)
     console.log({eventsR})
     let voterRegistered = [], workflowStatusChange = [], proposalRegistered = [], voted = [];
