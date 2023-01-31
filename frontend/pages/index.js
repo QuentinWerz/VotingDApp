@@ -34,6 +34,10 @@ export default function Home({ }) {
   const [proposalWritten, setProposalWritten] = useState('')
   const [addressVoter, setAddressVoter] = useState()
 
+  useEffect(()=>{console.log({owner})}, [owner])
+  useEffect(()=>{console.log({isRegistered})}, [isRegistered])
+  useEffect(()=>{console.log({hasVoted})}, [hasVoted])
+
   //USE EFFECT EVENTS
   useEffect(() => {
     if (isConnected) {
@@ -50,13 +54,12 @@ export default function Home({ }) {
     setOwner(owner)
 
     let blockNumber = await provider.getBlockNumber()
-    console.log({blockNumber})
 
     let filter = {
       address: contractAddress,
       fromBlock: blockNumber
     };
-
+    console.log({filter})
     let events = await contract.queryFilter(filter)
     let voterRegistered = [], workflowStatusChange = [], proposalRegistered = [], voted = [];
 
