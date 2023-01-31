@@ -56,9 +56,9 @@ export default function Home({ }) {
     };
 
     let eventsConsolidated = [];
-    for(let i = blockNumber; i < endBlock; i ++) {
+    for(let i = blockNumber; i < endBlock; i += 5000) {
       const _startBlock = i;
-      const _endBlock = Math.min(endBlock, i + 1);
+      const _endBlock = Math.min(endBlock, i + 4999);
       const events = await contract.queryFilter(filter, _startBlock, _endBlock);
       eventsConsolidated = [...eventsConsolidated, ...events]
     }
