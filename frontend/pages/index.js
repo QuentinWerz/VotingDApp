@@ -21,7 +21,7 @@ export default function Home({ }) {
   //STATES//////////////////////
 
   //GLOBAL
-  const [status, setStatus] = useState('Registering Voters')
+  const [status, setStatus] = useState('Registering voters')
   const [owner, setOwner] = useState('')
   const [isRegistered, setIsRegistered] = useState(false)
   const [hasVoted, setHasVoted] = useState(false)
@@ -88,7 +88,7 @@ export default function Home({ }) {
       }
     })
     console.log({ voterRegistered, workflowStatusChange, proposalRegistered, voted })
-
+    console.log({eventsConsolidated})
     //SETTERS
     // is registered
     let voter = await getVoter(address)
