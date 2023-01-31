@@ -61,7 +61,7 @@ export default function Home({ }) {
     let filter = {
       address: contractAddress,
       fromBlock: blockNumber,
-      endBlock
+      toBlock: endBlock
     };
     console.log({filter})
     let events = await contract.queryFilter(filter)
