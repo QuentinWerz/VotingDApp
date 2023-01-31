@@ -38,6 +38,7 @@ export default function Home({ }) {
   useEffect(()=>{console.log({isRegistered})}, [isRegistered])
   useEffect(()=>{console.log({hasVoted})}, [hasVoted])
   useEffect(()=>{console.log({status})}, [status])
+  useEffect(()=>{console.log({address})}, [address])
 
   //USE EFFECT EVENTS
   useEffect(() => {
