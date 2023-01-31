@@ -49,16 +49,7 @@ export default function Home({ }) {
     setOwner(owner)
 
     let blockNumber = await provider.getBlockNumber()
-    let endBlock = blockNumber + 20
-
-    let filterW = {
-      address: contractAddress,
-      fromBlock: blockNumber
-    };
-
-    let eventsOtherWay = await contract.queryFilter(filterW)
-
-    console.log({eventsOtherWay})
+    let endBlock = blockNumber + 10000
 
     let filter = {
       address: contractAddress,
