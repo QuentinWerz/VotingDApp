@@ -20,7 +20,7 @@ export default function Home({ }) {
   //STATES////////////////////////////////////////////////////
 
   //GLOBAL
-  const [status, setStatus] = useState('Registering voters')
+  const [status, setStatus] = useState('')
   const [owner, setOwner] = useState('')
   const [isRegistered, setIsRegistered] = useState(false)
   const [hasVoted, setHasVoted] = useState(false)
@@ -451,8 +451,12 @@ export default function Home({ }) {
           <Flex width='100%' height='100%' flexDirection='column' alignItems='center'>
             <Flex width='100%' direction='row' justifyContent='space-between' alignItems='center' backgroundColor='#FFF' padding={5} borderRadius={10}>
               <Flex width="30%" direction='row' justifyContent='flex-start' alignItems='center'>
+                {status &&
+                <>
                 <Text fontWeight='bold' >Current status : </Text>
                 <Text margin='0px 20px 0px 5px' fontWeight='bold' >{status}</Text>
+                </>
+                }
                 {address === owner && status !== 'Votes tallied' && <Button isLoading={loading} colorScheme="blue" onClick={() => { nextStatus() }}>{status === 'Voting session ended' ? 'Tally votes' : 'Next step'}</Button>}
               </Flex>
               {address === owner && status === 'Registering voters' &&
