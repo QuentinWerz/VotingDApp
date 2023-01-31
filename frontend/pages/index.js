@@ -23,7 +23,7 @@ export default function Home({ }) {
   //GLOBAL
   const [status, setStatus] = useState('Registering Voters')
   const [owner, setOwner] = useState('')
-  const [isRegistered, setIsRegistered] = useState(true)
+  const [isRegistered, setIsRegistered] = useState(false)
   const [hasVoted, setHasVoted] = useState(false)
   const [voters, setVoters] = useState([])
   const [proposals, setProposals] = useState([])
@@ -58,17 +58,17 @@ export default function Home({ }) {
     let blockNumber = await provider.getBlockNumber()
     let endBlock = blockNumber + 20
 
-    // let filter = {
-    //   address: contractAddress,
-    //   fromBlock: blockNumber,
-    //   toBlock: endBlock
-    // };
-    // console.log({filter})
+    let filter = {
+      address: contractAddress,
+      // fromBlock: blockNumber,
+      // toBlock: endBlock
+    };
+    console.log({filter})
 
     let eventsR = [];
     for(let i = blockNumber; i < endBlock; i ++) {
       const _startBlock = i;
-      const _endBlock = Math.min(endBlock, i + 1);
+      const _endBlock = i + 1;
       const events = await contract.queryFilter(filter, _startBlock, _endBlock);
       eventsR = [...eventsR, ...events]
     }
@@ -76,7 +76,7 @@ export default function Home({ }) {
     console.log({eventsR})
     let voterRegistered = [], workflowStatusChange = [], proposalRegistered = [], voted = [];
 
-    events.forEach(e => {
+    eventsR.forEach(e => {
       if (e.event === "VoterRegistered") {
         voterRegistered.push(e.args)
       }
