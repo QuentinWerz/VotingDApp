@@ -469,9 +469,9 @@ export default function Home({ }) {
                   <Button isLoading={loading} colorScheme='blue' onClick={() => { addProposal(proposalWritten)  }}>Add proposal</Button>
                 </Flex>
               }
-              {status !== 'Registering voters' && !isRegistered &&
+              {status !== 'Registering voters' && !isRegistered && address !== owner &&
                 <Flex width="70%" direction="row" justifyContent='flex-end' alignItems='center'>
-                  <Text fontWeight='bold'>You're not registered for this session.</Text>
+                  <Text fontWeight='bold'>You're not registered.</Text>
                 </Flex>
               }
               {status === 'Votes tallied' && isRegistered &&
