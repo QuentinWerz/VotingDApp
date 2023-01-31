@@ -51,9 +51,19 @@ export default function Home({ }) {
     let blockNumber = await provider.getBlockNumber()
     let endBlock = blockNumber + 20
 
+    let filterW = {
+      address: contractAddress,
+      fromBlock: blockNumber
+    };
+
+    let eventsOtherWay = await contract.queryFilter(filterW)
+
+    console.log({eventsOtherWay})
+
     let filter = {
       address: contractAddress,
     };
+
 
     let eventsConsolidated = [];
     for(let i = blockNumber; i < endBlock; i += 5000) {
@@ -62,6 +72,7 @@ export default function Home({ }) {
       const events = await contract.queryFilter(filter, _startBlock, _endBlock);
       eventsConsolidated = [...eventsConsolidated, ...events]
     }
+    console.log({eventsConsolidated})
 
     let voterRegistered = [], workflowStatusChange = [], proposalRegistered = [], voted = [];
 
