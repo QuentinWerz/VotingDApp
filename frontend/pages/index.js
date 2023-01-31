@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react'
 import { useAccount, useContractRead, useProvider, useSigner } from 'wagmi'
 import Contract from "../Voting.json"
 import { ethers } from 'ethers'
-import Link from 'next/link'
 import { Proposal } from '@/components/Proposal/Proposal'
 
 export default function Home({ }) {
@@ -18,7 +17,7 @@ export default function Home({ }) {
   //ADDRESS OF THE SMART CONTRACT
   const contractAddress = process.env.NEXT_PUBLIC_SCADDRESS
 
-  //STATES//////////////////////
+  //STATES////////////////////////////////////////////////////
 
   //GLOBAL
   const [status, setStatus] = useState('Registering voters')
@@ -34,6 +33,7 @@ export default function Home({ }) {
   const [proposalWritten, setProposalWritten] = useState('')
   const [addressVoter, setAddressVoter] = useState()
 
+  //LISTENERS
   useEffect(()=>{console.log({owner})}, [owner])
   useEffect(()=>{console.log({isRegistered})}, [isRegistered])
   useEffect(()=>{console.log({hasVoted})}, [hasVoted])
@@ -88,9 +88,9 @@ export default function Home({ }) {
       }
     })
     console.log({ voterRegistered, workflowStatusChange, proposalRegistered, voted })
-    console.log({eventsConsolidated})
+
     //SETTERS
-    // is registered
+    // is registered et hasVoted
     let voter = await getVoter(address)
     voter?.isRegistered ? setIsRegistered(true) : setIsRegistered(false)
     voter?.hasVoted ? setHasVoted(true) : setHasVoted(false)
