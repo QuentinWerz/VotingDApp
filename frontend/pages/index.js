@@ -49,7 +49,7 @@ export default function Home({ }) {
     setOwner(owner)
 
     let blockNumber = await provider.getBlockNumber()
-    let endBlock = blockNumber + 1000
+    let endBlock = blockNumber + 20
 
     let filter = {
       address: contractAddress,
@@ -58,7 +58,7 @@ export default function Home({ }) {
     let eventsConsolidated = [];
     for(let i = blockNumber; i < endBlock; i ++) {
       const _startBlock = i;
-      const _endBlock = Math.min(endBlock, i + 100);
+      const _endBlock = Math.min(endBlock, i + 1);
       const events = await contract.queryFilter(filter, _startBlock, _endBlock);
       eventsConsolidated = [...eventsConsolidated, ...events]
     }
