@@ -43,7 +43,7 @@ export default function Home({ }) {
 
   //FUNCTIONS/////////////////////////
 
-  //GET EVENTS AND STRUCTURE DATAS FOR FRONT
+  //GET EVENTS AND STRUCTURE DATAS FOR FRONT   
   const getEvents = async () => {
     const contract = new ethers.Contract(contractAddress, Contract.abi, provider)
     let owner = await contract.owner()
