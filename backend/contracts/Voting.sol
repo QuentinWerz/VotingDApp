@@ -81,7 +81,8 @@ contract Voting is Ownable {
     function addProposal(string memory _desc) external onlyVoters {
         require(workflowStatus == WorkflowStatus.ProposalsRegistrationStarted, 'Proposals are not allowed yet');
         require(keccak256(abi.encode(_desc)) != keccak256(abi.encode("")), 'You have to write something');
-
+        require(proposalsArray.length < 20, "Sorry, proposals number limited to 20");
+        
         Proposal memory proposal;
         proposal.description = _desc;
         proposalsArray.push(proposal);
@@ -109,7 +110,6 @@ contract Voting is Ownable {
     ///@notice Start proposing session (reserved to owner)
     function startProposalsRegistering() external onlyOwner {
         require(workflowStatus == WorkflowStatus.RegisteringVoters, 'Registering proposals cant be started now');
-        require(proposalsArray.length < 20, "Sorry, proposals number limited to 20");
         workflowStatus = WorkflowStatus.ProposalsRegistrationStarted;
         
         Proposal memory proposal;
