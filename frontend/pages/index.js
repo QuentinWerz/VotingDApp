@@ -130,7 +130,7 @@ export default function Home({ }) {
              winningId = i;
         }
      }
-    setWinningProposal(winningId + 1 )
+    setWinningProposal(winningId + 1)
     console.log({proposals})
     console.log({winningProposal})
     setLoading(false)
