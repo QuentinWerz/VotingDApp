@@ -124,9 +124,15 @@ export default function Home({ }) {
     })
     Promise.all(proposalsFound).then(function (results) { setProposals(results) })
     //winning proposal
+    let winningId = 0;
     for (let i = 0; i < proposals.length; i++) {
-      if (proposals[i].voteCount > proposals[i - 1]?.voteCount) { setWinningProposal(proposals[i].id) }
-    }
+         if (proposals[i].voteCount > proposals[winningId].voteCount) {
+             winningId = i;
+        }
+     }
+    setWinningProposal(winningId + 1 )
+    console.log({proposals})
+    console.log({winningProposal})
     setLoading(false)
     setAddressVoter('')
     setProposalWritten('')
