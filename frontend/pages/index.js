@@ -48,24 +48,22 @@ export default function Home({ }) {
     let owner = await contract.owner()
     setOwner(owner)
 
-    let blockNumber = await provider.getBlockNumber()
-    let endBlock = blockNumber + 100
-
-    console.log({endBlock})
+    let startBlock = 8410572 - 1
+    let endBlock = await provider.getBlockNumber()
 
     let filter = {
       address: contractAddress,
     };
 
     let eventsConsolidated = [];
-    for(let i = blockNumber; i < endBlock; i += 5000) {
-      console.log({i})
+    for (let i = startBlock; i < endBlock; i += 500) {
       const _startBlock = i;
-      const _endBlock = Math.min(endBlock, i + 4999);
+      const _endBlock = Math.min(endBlock, i + 499);
+      console.log({ i, _startBlock, _endBlock })
       const events = await contract.queryFilter(filter, _startBlock, _endBlock);
       eventsConsolidated = [...eventsConsolidated, ...events]
     }
-    console.log({eventsConsolidated})
+    console.log({ eventsConsolidated })
 
     let voterRegistered = [], workflowStatusChange = [], proposalRegistered = [], voted = [];
 
@@ -77,7 +75,7 @@ export default function Home({ }) {
         workflowStatusChange.push(e.args)
       }
       else if (e.event === "ProposalRegistered") {
-        proposalRegistered.push(Number(e.args.proposalId.toString()))
+        proposalRegistered.push(Number(e.args.proposalId))
       }
       else if (e.event === 'Voted') {
         voted.push(e.args)
@@ -87,14 +85,14 @@ export default function Home({ }) {
 
     //SETTERS
     // is registered et hasVoted
-    let voter = await getVoter(address)
+    let voter = await getVoter(ethers.utils.getAddress(address))
     voter?.isRegistered ? setIsRegistered(true) : setIsRegistered(false)
     voter?.hasVoted ? setHasVoted(true) : setHasVoted(false)
     // voters
-    setVoters(voterRegistered.map(e => e.voterAddress))
+    setVoters(voterRegistered.map(e => ethers.utils.getAddress(e.voterAddress)))
     //structure the voters array
     let votersModified = voters.map(async (voter) => {
-      let vote = await getVoter(voter)
+      let vote = await getVoter(ethers.utils.getAddress(voter))
       return {
         votedProposalId: vote?.votedProposalId.toString(),
         isRegistered: vote?.isRegistered,
@@ -113,7 +111,7 @@ export default function Home({ }) {
       case 5: statusFound = 'Votes tallied'; break
       default: statusFound = 'Registering voters'; break
     }
-    console.log({statusFound})
+    console.log({ statusFound })
     setStatus(statusFound)
     //structure the proposals array
     const proposalsFound = proposalRegistered.map(async (id) => {
@@ -121,13 +119,13 @@ export default function Home({ }) {
       return {
         id: id,
         description: proposalFound?.description,
-        voteCount: voted.filter(e => Number(e.proposalId.toString()) === id).length
+        voteCount: voted.filter(e => Number(e.proposalId) === id).length
       }
     })
     Promise.all(proposalsFound).then(function (results) { setProposals(results) })
     //winning proposal
-    for (let i = 0; i < proposals.length ; i++) {
-      if(proposals[i].voteCount > proposals[i-1]?.voteCount) {setWinningProposal(proposals[i].id)}
+    for (let i = 0; i < proposals.length; i++) {
+      if (proposals[i].voteCount > proposals[i - 1]?.voteCount) { setWinningProposal(proposals[i].id) }
     }
     setLoading(false)
     setAddressVoter('')
@@ -141,7 +139,7 @@ export default function Home({ }) {
     try {
       setLoading(true)
       const contract = new ethers.Contract(contractAddress, Contract.abi, signer)
-      let transaction = await contract.addVoter(addressVoter)
+      let transaction = await contract.addVoter(ethers.utils.getAddress(addressVoter))
       await transaction.wait()
       getEvents()
       toast({
@@ -162,8 +160,8 @@ export default function Home({ }) {
         duration: 5000,
         isClosable: true,
       })
-    setLoading(false)
-    setAddressVoter('')
+      setLoading(false)
+      setAddressVoter('')
     }
   }
 
@@ -194,7 +192,7 @@ export default function Home({ }) {
         duration: 5000,
         isClosable: true,
       })
-    setLoading(false)
+      setLoading(false)
     }
   }
 
@@ -226,8 +224,8 @@ export default function Home({ }) {
         duration: 5000,
         isClosable: true,
       })
-    setLoading(false)
-    setProposalWritten('')
+      setLoading(false)
+      setProposalWritten('')
     }
   }
 
@@ -286,7 +284,7 @@ export default function Home({ }) {
         duration: 5000,
         isClosable: true,
       })
-    setLoading(false)
+      setLoading(false)
     }
   }
 
@@ -318,7 +316,7 @@ export default function Home({ }) {
         duration: 5000,
         isClosable: true,
       })
-    setLoading(false)
+      setLoading(false)
     }
   }
 
@@ -349,7 +347,7 @@ export default function Home({ }) {
         duration: 5000,
         isClosable: true,
       })
-    setLoading(false)
+      setLoading(false)
     }
   }
 
@@ -380,7 +378,7 @@ export default function Home({ }) {
         duration: 5000,
         isClosable: true,
       })
-    setLoading(false)
+      setLoading(false)
     }
   }
 
@@ -411,7 +409,7 @@ export default function Home({ }) {
         duration: 5000,
         isClosable: true,
       })
-    setLoading(false)
+      setLoading(false)
     }
   }
 
@@ -456,10 +454,10 @@ export default function Home({ }) {
             <Flex width='100%' direction='row' justifyContent='space-between' alignItems='center' backgroundColor='#FFF' padding={5} borderRadius={10}>
               <Flex width="30%" direction='row' justifyContent='flex-start' alignItems='center'>
                 {status &&
-                <>
-                <Text fontWeight='bold' >Current status : </Text>
-                <Text margin='0px 20px 0px 5px' fontWeight='bold' >{status}</Text>
-                </>
+                  <>
+                    <Text fontWeight='bold' >Current status : </Text>
+                    <Text margin='0px 20px 0px 5px' fontWeight='bold' >{status}</Text>
+                  </>
                 }
                 {address === owner && status !== 'Votes tallied' && <Button isLoading={loading} colorScheme="blue" onClick={() => { nextStatus() }}>{status === 'Voting session ended' ? 'Tally votes' : 'Next step'}</Button>}
               </Flex>
@@ -474,12 +472,7 @@ export default function Home({ }) {
                 <Flex width="70%" direction="row" justifyContent='flex-end' alignItems='center'>
                   <Text fontWeight='bold'>Proposal :</Text>
                   <Input margin='0px 20px 0px 20px' width='50%' placeholder={`Enter your proposal here`} value={proposalWritten} onChange={e => setProposalWritten(e.target.value)} />
-                  <Button isLoading={loading} colorScheme='blue' onClick={() => { addProposal(proposalWritten)  }}>Add proposal</Button>
-                </Flex>
-              }
-              {status !== 'Registering voters' && !isRegistered && address !== owner &&
-                <Flex width="70%" direction="row" justifyContent='flex-end' alignItems='center'>
-                  <Text fontWeight='bold'>You're not registered.</Text>
+                  <Button isLoading={loading} colorScheme='blue' onClick={() => { addProposal(proposalWritten) }}>Add proposal</Button>
                 </Flex>
               }
               {status === 'Votes tallied' && isRegistered &&
@@ -489,18 +482,28 @@ export default function Home({ }) {
               }
             </Flex>
             <Flex grow={1} width="100%" direction='row' justifyContent='space-evenly' flexWrap='wrap'>
-              {proposals?.length > 0 ?
-                proposals.map(proposal => {
-                  return (
-                    <Proposal proposal={proposal} setVote={setVote} status={status} isRegistered={isRegistered} hasVoted={hasVoted} loading={loading} winningProposal={winningProposal}/>
-                  )
-                })
+              {isRegistered ?
+                proposals?.length > 0 ?
+                  proposals.map(proposal => {
+                    return (
+                      <Proposal proposal={proposal} setVote={setVote} status={status} isRegistered={isRegistered} hasVoted={hasVoted} loading={loading} winningProposal={winningProposal} />
+                    )
+                  })
+                  :
+                  <Flex height="100%" width="100%" alignItems="center" justifyContent="center">
+                    <Alert status='warning' width="300px">
+                      <AlertIcon />
+                      <Flex direction="column">
+                        <Text as='span'>No proposal yet.</Text>
+                      </Flex>
+                    </Alert>
+                  </Flex>
                 :
                 <Flex height="100%" width="100%" alignItems="center" justifyContent="center">
                   <Alert status='warning' width="300px">
                     <AlertIcon />
                     <Flex direction="column">
-                      <Text as='span'>No proposal yet.</Text>
+                      <Text as='span'>You're not registered.</Text>
                     </Flex>
                   </Alert>
                 </Flex>
